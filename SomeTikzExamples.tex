@@ -1,0 +1,472 @@
+\documentclass{report}
+
+%basic packages that most documents have
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathtools}
+
+%packages specific to this document
+\usepackage{siunitx}
+\usepackage[svgnames]{xcolor}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.12}
+\usetikzlibrary{arrows,patterns,calc,matrix,decorations.markings}
+\usepackage{caption}
+\captionsetup{format=hang,font=small,justification=raggedright}
+\captionsetup[subfloat]{font=footnotesize}
+\usepackage{subfig}
+\usepackage[colorlinks=true, allcolors=black]{hyperref}
+\usepackage[noabbrev]{cleveref}
+\usepackage{autonum}
+\crefname{figure}{figure}{figures}
+\crefformat{equation}{equation~\textup{#2#1#3}}
+\Crefformat{equation}{Equation~\textup{#2#1#3}}
+
+%COLORS USED
+\colorlet{ConeColor}{DarkBlue}
+\colorlet{AxisColor}{red}
+\colorlet{PlaneColor}{DarkGreen}
+\colorlet{HighlightColor}{red}
+\colorlet{ParabolaColor}{DarkBlue}
+\colorlet{FocDirColor}{DarkBlue}
+\colorlet{BeamColor}{orange}
+
+%THEOREM ENVIRONMENTS
+\theoremstyle{definition}
+\newtheorem{HistoricalNote}{Historical Note}
+\newtheorem{Definition}{Definition}
+\newtheorem{Theorem}{Theorem}
+\newtheorem{Remark}{Remark}
+\newtheorem{YouTryThis}{You Try This}
+\newtheorem{TeachingConnection}{Teaching Connection}
+
+%MY CUSTOM STUFF
+\tikzstyle directed=[postaction={decorate,decoration={markings, mark=at position .5 with {\arrow[scale=1]{stealth}}}}]
+\tikzstyle reverse directed=[postaction={decorate,decoration={markings, mark=at position .5 with {\arrowreversed[scale=1]{stealth};}}}]
+
+\begin{document}
+
+\begin{figure}[ht]
+\centering%
+\subfloat[A right circular cone.]{%
+\begin{tikzpicture}[x = (270:0.25cm), y = (0:1cm), z = (90:1cm), scale=0.9]
+\def\numSamples{400}
+\def\circRad{2.5}
+\def\circZ{4}
+\def\generatorAng{140}
+\def\pointSep{1}
+
+%Draws the Cone
+\foreach \t in {1,...,\numSamples} {
+\fill[ConeColor!45, opacity=0.25] (0,0,0) -- ({\circRad*cos((\t*2*pi/\numSamples) r)},{\circRad*sin((\t*2*pi/\numSamples) r)},-\circZ) -- ({\circRad*cos(((\t-1)*2*pi/\numSamples) r)},{\circRad*sin(((\t-1)*2*pi/\numSamples) r)},-\circZ);}
+\draw[ConeColor] (0,0,-\circZ) circle(\circRad);
+
+%Draws the Vertex
+\draw (0,0,0) node[AxisColor, circle, fill=AxisColor, inner sep=\pointSep]{};
+\draw[AxisColor] (0,0,0) node[right]{$V$};
+
+%Draw the Angle
+\draw[gray,thin] (0,0,-\circZ)--(0,\circRad,-\circZ);
+\draw[gray,thin] (0,0.35,-\circZ)--(0,0.35,{0.35-\circZ})--(0,0,{0.35-\circZ});
+
+%Draws the Origin
+\draw (0,0,-\circZ) node[AxisColor, circle, fill=AxisColor, inner sep=\pointSep]{};
+\draw[AxisColor] (0,0,-\circZ) node[left]{$O$};
+
+%Draws the Axis
+\draw[AxisColor] (0,0,0) -- (0,0,-\circZ);
+\end{tikzpicture}
+\label{fig:cone1}}\qquad
+\subfloat[A (non-right) circular cone.]{%
+\begin{tikzpicture}[x = (270:0.25cm), y = (0:1cm), z = (90:1cm), scale=0.9]
+\def\numSamples{400}
+\def\circRad{2.5}
+\def\circZ{4}
+\def\generatorAng{140}
+\def\pointSep{1}
+
+%Draws the Cone
+\foreach \t in {1,...,\numSamples} {
+\fill[ConeColor!45, opacity=0.25] (0,1,0) -- ({\circRad*cos((\t*2*pi/\numSamples) r)},{\circRad*sin((\t*2*pi/\numSamples) r)},-\circZ) -- ({\circRad*cos(((\t-1)*2*pi/\numSamples) r)},{\circRad*sin(((\t-1)*2*pi/\numSamples) r)},-\circZ);}
+\draw[ConeColor] (0,0,-\circZ) circle(\circRad);
+
+%Draws the Vertex
+\draw (0,1,0) node[AxisColor, circle, fill=AxisColor, inner sep=\pointSep]{};
+\draw[AxisColor] (0,1,0) node[right]{$V$};
+
+%Draws the Origin
+\draw (0,0,-\circZ) node[AxisColor, circle, fill=AxisColor, inner sep=\pointSep]{};
+\draw[AxisColor] (0,0,-\circZ) node[left]{$O$};
+
+%Draws the Axis
+\draw[AxisColor] (0,1,0) -- (0,0,-\circZ);
+\end{tikzpicture}
+\label{fig:cone2}}
+\caption{Examples of circular cones.}
+\label{fig:cone}
+\end{figure}
+
+\begin{figure}[ht]
+\centering%
+\begin{tikzpicture}[x = (210:0.3cm), y = (0:1cm), z = (90:1cm), scale=0.6]
+\def\numSamples{400}
+\def\circRad{4}
+\def\circZ{4}
+\def\generatorAng{140}
+\def\pointSep{1}
+
+%Draws the Vertical Axis
+\draw[gray,<->] (0,0,{\circZ+0.5})node[above]{\scriptsize{$y$}} -- (0,0,{-\circZ-0.5});
+\draw[gray,<->] ({\circZ+0.5},0,0)node[below left]{\scriptsize{$z$}} -- ({-\circZ-0.5},0,0);
+\draw[gray,<->] (0,{\circZ+0.5},0)node[right]{\scriptsize{$x$}} -- (0,{-\circZ-0.5},0);
+
+%Draws the Cone
+\foreach \t in {1,...,\numSamples} {
+\fill[ConeColor!45, opacity=0.25] (0,0,0) -- ({\circRad*cos((\t*2*pi/\numSamples) r)},{\circRad*sin((\t*2*pi/\numSamples) r)},\circZ) -- ({\circRad*cos(((\t-1)*2*pi/\numSamples) r)},{\circRad*sin(((\t-1)*2*pi/\numSamples) r)},\circZ);
+\fill[ConeColor!45, opacity=0.25] (0,0,0) -- ({\circRad*cos((\t*2*pi/\numSamples) r)},{\circRad*sin((\t*2*pi/\numSamples) r)},-\circZ) -- ({\circRad*cos(((\t-1)*2*pi/\numSamples) r)},{\circRad*sin(((\t-1)*2*pi/\numSamples) r)},-\circZ);}
+\draw[ConeColor!45, thin, dashed] (0,0,\circZ) circle(\circRad);
+\draw[ConeColor!45, thin, dashed] (0,0,-\circZ) circle(\circRad);
+
+%Draws the Origin
+\draw (0,0,0) node[AxisColor, circle, fill=AxisColor, inner sep=\pointSep]{};
+\draw[AxisColor] (0,0,0) node[right]{$O$};
+
+%Draws the Generator
+\draw[AxisColor,<->] ({-1.1*\circRad*sin(\generatorAng)},{1.1*\circRad*cos(\generatorAng)},{1.1*\circZ}) -- ({1.1*\circRad*sin(\generatorAng)},{-1.1*\circRad*cos(\generatorAng)},{-1.1*\circZ});
+
+%Draws P
+\draw ({-\circRad*sin(\generatorAng)},{\circRad*cos(\generatorAng)},\circZ) node[AxisColor, circle, fill=AxisColor, inner sep=\pointSep]{};
+\draw[AxisColor] ({-\circRad*sin(\generatorAng)},{\circRad*cos(\generatorAng)},{\circZ}) node[left]{$P$};
+
+%Draws P^\prime
+\draw ({\circRad*sin(\generatorAng)},{-\circRad*cos(\generatorAng)},-\circZ) node[AxisColor, circle, fill=AxisColor, inner sep=\pointSep]{};
+\draw[AxisColor] ({\circRad*sin(\generatorAng)},{-\circRad*cos(\generatorAng)},{-\circZ}) node[right]{$P^\prime$};
+
+%Draws \alpha
+\draw[AxisColor] plot[samples=25, domain={atan(\circZ/\circRad)}:90, variable=\t] ({-sqrt(\circZ*\circZ + \circRad*\circRad)*cos(\t)/6 * sin(\generatorAng)} , {sqrt(\circZ*\circZ + \circRad*\circRad)*cos(\t)/6 * cos(\generatorAng)} , {sqrt(\circZ*\circZ + \circRad*\circRad)*sin(\t)/6});
+\draw[AxisColor] ({-sqrt(\circZ*\circZ + \circRad*\circRad)*cos(atan(\circZ/\circRad)/2 + 45)/4.5 * sin(\generatorAng)} , {sqrt(\circZ*\circZ + \circRad*\circRad)*cos(atan(\circZ/\circRad)/2 + 45)/4.5 * cos(\generatorAng)} , {sqrt(\circZ*\circZ + \circRad*\circRad)*sin(atan(\circZ/\circRad)/2 + 45)/4.5}) node{$\alpha$};
+\end{tikzpicture}
+\caption{A right double infinite cone.}
+\label{fig:infinitecone}
+\end{figure}
+
+\begin{figure}[ht]
+\centering%
+\subfloat[Circle]{%
+\begin{tikzpicture}[x = (225:0.3cm), y = (0:1cm), z = (90:1cm), scale=0.5]
+\def\numSamples{400}
+\def\circRad{4}
+\def\circZ{4}
+\def\generatorAng{140}
+\def\pointSep{1.5}
+
+%Draws the Vertical Axis
+\draw[gray] (0,0,\circZ) -- (0,0,-\circZ);
+
+%Draws the Cone
+\foreach \t in {1,...,\numSamples} {
+\fill[ConeColor!45, opacity=0.25] (0,0,0) -- ({\circRad*cos((\t*2*pi/\numSamples) r)},{\circRad*sin((\t*2*pi/\numSamples) r)},\circZ) -- ({\circRad*cos(((\t-1)*2*pi/\numSamples) r)},{\circRad*sin(((\t-1)*2*pi/\numSamples) r)},\circZ);
+\fill[ConeColor!45, opacity=0.25] (0,0,0) -- ({\circRad*cos((\t*2*pi/\numSamples) r)},{\circRad*sin((\t*2*pi/\numSamples) r)},-\circZ) -- ({\circRad*cos(((\t-1)*2*pi/\numSamples) r)},{\circRad*sin(((\t-1)*2*pi/\numSamples) r)},-\circZ);}
+\draw[ConeColor!45, thin, dashed] (0,0,\circZ) circle(\circRad);
+\draw[ConeColor!45, thin, dashed] (0,0,-\circZ) circle(\circRad);
+
+%Draws the Plane
+\draw[PlaneColor!45, fill=PlaneColor!45, opacity=.35] (4,4,2)--(4,-4,2)--(-4,-4,2)--(-4,4,2)--(4,4,2);
+
+%Draws the Conic
+\draw[AxisColor] (0,0,2) circle(2);
+\end{tikzpicture}
+\label{fig:conics_circle}}\qquad
+\subfloat[Ellipse]{%
+\begin{tikzpicture}[x = (225:0.3cm), y = (0:1cm), z = (90:1cm), scale=0.5]
+\def\numSamples{400}
+\def\circRad{4}
+\def\circZ{4}
+\def\generatorAng{140}
+\def\pointSep{1.5}
+
+%Draws the Vertical Axis
+\draw[gray] (0,0,\circZ) -- (0,0,-\circZ);
+
+%Draws the Cone
+\foreach \t in {1,...,\numSamples} {
+\fill[ConeColor!45, opacity=0.25] (0,0,0) -- ({\circRad*cos((\t*2*pi/\numSamples) r)},{\circRad*sin((\t*2*pi/\numSamples) r)},\circZ) -- ({\circRad*cos(((\t-1)*2*pi/\numSamples) r)},{\circRad*sin(((\t-1)*2*pi/\numSamples) r)},\circZ);
+\fill[ConeColor!45, opacity=0.25] (0,0,0) -- ({\circRad*cos((\t*2*pi/\numSamples) r)},{\circRad*sin((\t*2*pi/\numSamples) r)},-\circZ) -- ({\circRad*cos(((\t-1)*2*pi/\numSamples) r)},{\circRad*sin(((\t-1)*2*pi/\numSamples) r)},-\circZ);}
+\draw[ConeColor!45, thin, dashed] (0,0,\circZ) circle(\circRad);
+\draw[ConeColor!45, thin, dashed] (0,0,-\circZ) circle(\circRad);
+
+%Draws the Plane
+\draw[PlaneColor!45, fill=PlaneColor!45, opacity=.35] (4,4,{1.5 + 4*0 + 4*(-0.5)})--(4,-4,{1.5 + 4*0 - 4*(-0.5)})--(-4,-4,{1.5 - 4*0 - 4*(-0.5)})--(-4,4,{1.5 - 4*0 + 4*(-0.5)})--(4,4,{1.5 + 4*0 + 4*(-0.5)});
+
+%Draws the Conic
+\draw[AxisColor] plot[domain={-3}:{1}, samples=100, variable=\y] ({sqrt(9/4 - (3/2)*\y - (3/4)*\y*\y)} , {\y} , {1.5 - \y/2});
+\draw[AxisColor] plot[domain={-3}:{1}, samples=100, variable=\y] ({-sqrt(9/4 - (3/2)*\y - (3/4)*\y*\y)} , {\y} , {1.5 - \y/2});
+\end{tikzpicture}
+\label{fig:conics_ellipse}}\\
+\subfloat[Parabola]{%
+\begin{tikzpicture}[x = (225:0.3cm), y = (0:1cm), z = (90:1cm), scale=0.5]
+\def\numSamples{400}
+\def\circRad{4}
+\def\circZ{4}
+\def\generatorAng{140}
+\def\pointSep{1.5}
+
+%Draws the Vertical Axis
+\draw[gray] (0,0,\circZ) -- (0,0,-\circZ);
+
+%Draws the Cone
+\foreach \t in {1,...,\numSamples} {
+\fill[ConeColor!45, opacity=0.25] (0,0,0) -- ({\circRad*cos((\t*2*pi/\numSamples) r)},{\circRad*sin((\t*2*pi/\numSamples) r)},\circZ) -- ({\circRad*cos(((\t-1)*2*pi/\numSamples) r)},{\circRad*sin(((\t-1)*2*pi/\numSamples) r)},\circZ);
+\fill[ConeColor!45, opacity=0.25] (0,0,0) -- ({\circRad*cos((\t*2*pi/\numSamples) r)},{\circRad*sin((\t*2*pi/\numSamples) r)},-\circZ) -- ({\circRad*cos(((\t-1)*2*pi/\numSamples) r)},{\circRad*sin(((\t-1)*2*pi/\numSamples) r)},-\circZ);}
+\draw[ConeColor!45, thin, dashed] (0,0,\circZ) circle(\circRad);
+\draw[ConeColor!45, thin, dashed] (0,0,-\circZ) circle(\circRad);
+
+%Draws the Plane
+\draw[PlaneColor!45, fill=PlaneColor!45, opacity=.35] (4,4,{(1) + 4*(0) + 4*(-1)})--(4,-3,{(1) + 4*(0) - 3*(-1)})--(-4,-3,{(1) - 4*(0) - 3*(-1)})--(-4,4,{(1) - 4*(0) + 4*(-1)})--(4,4,{(1) + 4*(0) + 4*(-1)});
+
+%Draws the Conic
+\draw[AxisColor] plot[domain={-2.64}:{2.64}, samples=100, variable=\x] ({\x} , {-0.5*\x*\x + 0.5} , {0.5*\x*\x + 0.5});
+\end{tikzpicture}
+\label{fig:conics_parabola}}\qquad
+\subfloat[Hyperbola]{%
+\begin{tikzpicture}[x = (225:0.3cm), y = (0:1cm), z = (90:1cm), scale=0.5]
+\def\numSamples{400}
+\def\circRad{4}
+\def\circZ{4}
+\def\generatorAng{140}
+\def\pointSep{1.5}
+
+%Draws the Vertical Axis
+\draw[gray] (0,0,\circZ) -- (0,0,-\circZ);
+
+%Draws the Cone
+\foreach \t in {1,...,\numSamples} {
+\fill[ConeColor!45, opacity=0.25] (0,0,0) -- ({\circRad*cos((\t*2*pi/\numSamples) r)},{\circRad*sin((\t*2*pi/\numSamples) r)},\circZ) -- ({\circRad*cos(((\t-1)*2*pi/\numSamples) r)},{\circRad*sin(((\t-1)*2*pi/\numSamples) r)},\circZ);
+\fill[ConeColor!45, opacity=0.25] (0,0,0) -- ({\circRad*cos((\t*2*pi/\numSamples) r)},{\circRad*sin((\t*2*pi/\numSamples) r)},-\circZ) -- ({\circRad*cos(((\t-1)*2*pi/\numSamples) r)},{\circRad*sin(((\t-1)*2*pi/\numSamples) r)},-\circZ);}
+\draw[ConeColor!45, thin, dashed] (0,0,\circZ) circle(\circRad);
+\draw[ConeColor!45, thin, dashed] (0,0,-\circZ) circle(\circRad);
+
+%Draws the Plane
+\draw[PlaneColor!45, fill=PlaneColor!45, opacity=.35] (4,1.5,4)--(-4,1.5,4)--(-4,1.5,-4)--(4,1.5,-4)--(4,1.5,4);
+
+%Draws the Conic
+\draw[AxisColor] plot[domain=-3.708:3.708, samples=100, variable=\x] (\x, 1.5, {sqrt(pow(\x,2) + pow(1.5,2))});
+\draw[AxisColor] plot[domain=-3.708:3.708, samples=100, variable=\x] (\x, 1.5, {-sqrt(pow(\x,2) + pow(1.5,2))});
+\end{tikzpicture}
+\label{fig:conics_hyperbola}}
+\caption{Demonstrations of the various conic sections.}
+\label{fig:conics}
+\end{figure}
+
+\begin{figure}[ht]
+\centering%
+\subfloat[A parabola in a plane defined by a focus and directrix.]{%
+\scriptsize
+\begin{tikzpicture}[scale=0.7]
+\draw[white, fill=white] (3,-1) circle(0.06) node[below]{$B(x,-p)$};
+\draw[dashed,thin] (0,-1.5)--(0,4);
+\draw[thin] (.2,-1)--(.2,-.8)--(0,-.8);
+\draw[FocDirColor, fill=FocDirColor] (0,1) circle(0.06) node[left]{$F$};
+\draw[FocDirColor, <->] (-4.1,-1)--(4.1,-1) node[right]{$d$};
+\draw[ParabolaColor, <->, thick] plot[domain=-4:4, samples=100, variable=\x] ({\x},{0.25*pow(\x,2)});
+\draw[ParabolaColor, fill=ParabolaColor] (0,0) circle(0.06) node[below left]{$V$};
+\end{tikzpicture}
+\label{fig:parabola1}}\qquad
+\subfloat[The same parabola with coordinates.]{%
+\scriptsize
+\begin{tikzpicture}[scale=0.7]
+\draw[<->] (0,-1.5)--(0,4)node[above]{$y$};
+\draw[<->] (-4.1,0)--(4.1,0)node[right]{$x$};
+\draw[thin] (.2,-1)--(.2,-.8)--(0,-.8);
+\draw[FocDirColor, fill=FocDirColor] (0,1) circle(0.06) node[left]{$F(0,p)$};
+\draw[HighlightColor, fill=HighlightColor] (0,-1) circle(0.06) node[below left]{$(0,-p)$};
+\draw[FocDirColor, <->] (-4.1,-1)--(4.1,-1) node[right]{$d$};
+\draw[ParabolaColor, <->, thick] plot[domain=-4:4, samples=100, variable=\x] ({\x},{0.25*pow(\x,2)});
+\draw[ParabolaColor, fill=ParabolaColor] (0,0) circle(0.06) node[below left]{$V(0,0)$};
+\draw[HighlightColor, fill=HighlightColor] (3,2.25) circle(0.06) node[right]{$A(x,y)$};
+\draw[HighlightColor, fill=HighlightColor] (3,-1) circle(0.06) node[below]{$B(x,-p)$};
+\draw[HighlightColor] (0,1)--(3,2.25);
+\draw[HighlightColor] (3,2.25)--(3,-1);
+\end{tikzpicture}
+\label{fig:parabola2}}
+\caption{The graph of a parabola.  The focus is $F$ and the directrix is $y=d$.}
+\label{fig:parabola}
+\end{figure}
+
+\begin{figure}[ht]
+\centering%
+\scriptsize
+\begin{tikzpicture}[scale=0.7]
+\draw[<->, ParabolaColor, thick] plot[domain=-4:4, samples=200] ({\x},{0.25*pow(\x,2)})node[above]{parabola};
+\draw[<->,thin] plot[domain=0:4, samples=2] ({\x},{\x-1}) node[right]{tangent line};
+\draw[<->,thin] plot[domain=0:4, samples=2] ({\x},{-\x+3}) node[right]{normal line};
+\draw[thin] (2.2,0.8)--(2.4,1)--(2.2,1.2);
+\draw[directed, BeamColor, thick] plot[domain=-.5:2, samples=2] ({\x},{-0.25*(\x-2)+1});
+\draw[BeamColor] (-.5,{-0.25*(-.5-2)+1}) node[left]{incoming};
+\draw[reverse directed, BeamColor, thick] plot[domain={2-2.5/4}:2, samples=2] ({\x},{-4*(\x-2)+1});
+\draw[BeamColor] ({2-2.5/4},{-4*(2-2.5/4-2)+1}) node[left]{outgoing};
+\draw[HighlightColor] ({2+.75*cos(45)},{1+.75*sin(45)}) arc(45:{90+atan(1/4)}:.75);
+\draw[HighlightColor] ({2+.75*cos(180-atan(1/4))},{1+.75*sin(180-atan(1/4))}) arc({180-atan(1/4)}:225:.75);
+\draw[HighlightColor] ({2+1*cos((45+90+atan(1/4))/2)},{1+1*sin((45+90+atan(1/4))/2)}) node{$\beta$};
+\draw[HighlightColor] ({2+1*cos((180-atan(1/4)+225)/2)},{1+1*sin((180-atan(1/4)+225)/2)}) node{$\alpha$};
+\end{tikzpicture}
+\caption{A beam of light being reflected by a parabolic mirror.}
+\label{fig:beam}
+\end{figure}
+
+\begin{figure}[ht]
+\centering%
+\scriptsize
+\begin{tikzpicture}[scale=0.7]
+\draw[<->] (-4.1,0)--(4.1,0) node[right]{$x$};
+\draw[<->] (0,-2.6)--(0,4.1) node[above]{$y$};
+\draw[<->, FocDirColor] (-4.1,-1) node[left]{$d$}--(4.1,-1);
+\draw[<->, ParabolaColor, thick] plot[domain=-4:4, samples=200] ({\x},{0.25*pow(\x,2)})node[above]{parabola};
+\draw[<->,thin] plot[domain=-.25:4, samples=2] ({\x},{1.5*(\x-3) + 2.25}) node[right]{tangent line};
+\draw[reverse directed, BeamColor, thick] (0,1)--(3,2.25);
+\draw[reverse directed, BeamColor, thick] (3,2.25)--(3,4);
+\draw[HighlightColor] (3,2.25)--(3,-1);
+\draw[HighlightColor, fill=HighlightColor] (3,2.25) circle(0.06) node[right]{$A(x_0,y_0)$};
+\draw[HighlightColor, fill=HighlightColor] (0,-2.25) circle(0.06) node[below right]{$B$};
+\draw[HighlightColor, fill=HighlightColor] (3,0) circle(0.06) node[below right]{$D(x_0,0)$};
+\draw[HighlightColor, fill=HighlightColor] (3,-1) circle(0.06) node[below right]{$C(x_0,-p)$};
+\draw[FocDirColor, fill=FocDirColor] (0,1) circle(0.06) node[left]{$F(0,p)$};
+\draw[HighlightColor, fill=HighlightColor] (0,-1) circle(0.06) node[below left]{$(0,-p)$};
+\draw[HighlightColor, fill=HighlightColor] (3,3.8) circle(0.06) node[left]{$G$};
+\draw[HighlightColor, fill=HighlightColor] (0,0) circle(0.06) node[below left]{$O$};
+\draw[HighlightColor] (0,-1.5) arc(90:atan(1.5):.75);
+\draw[HighlightColor] ({0+0.95*cos((90+atan(1.5))/2)},{-2.25+0.95*sin((90+atan(1.5))/2)}) node{$\alpha_2$};
+\draw[HighlightColor] ({3},{2.25-0.75}) arc(270:{180+atan(1.5)}:.75);
+\draw[HighlightColor] ({3+0.95*cos((270+180+atan(1.5))/2)},{2.25+0.95*sin((270+180+atan(1.5))/2)}) node{$\alpha_1$};
+\draw[HighlightColor] ({3+0.6*cos((180+atan(1.5)))},{2.25+0.6*sin((180+atan(1.5)))}) arc({180+atan(1.5)}:{180+atan(1.25/3)}:.6);
+\draw[HighlightColor] ({3+0.9*cos((180*2+atan(1.5)+atan(1.25/3))/2)},{2.25+0.9*sin((180*2+atan(1.5)+atan(1.25/3))/2)}) node{$\beta$};
+\draw[HighlightColor] ({3+0.6*cos((atan(1.5)))},{2.25+0.6*sin((atan(1.5)))}) arc({atan(1.5)}:{90}:.6);
+\draw[HighlightColor] ({3+0.9*cos((90+atan(1.5))/2)},{2.25+0.9*sin((90+atan(1.5))/2)}) node{$\alpha$};
+\end{tikzpicture}
+\caption{The figure used in the proof of the reflective property of the parabola.}
+\label{fig:proof}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[x = (210:1cm), y = (0:1cm), z = (90:1cm), scale=.9]
+%These parameters control the first plane.  What eventually gets plotted is the
+%plane whose equation is z = \cp + (\xp)*x + (\yp)*y
+\def\cp{2}
+\def\xp{-0.25}
+\def\yp{0.25}
+
+%These parameters control the second plane.  What eventually gets plotted is the
+%plane whose equation is z = \cq + (\xq)*x + (\yq)*y
+\def\cq{3.5}
+\def\xq{-0.333333}
+\def\yq{-0.5}
+
+%These will control the size of the axes.  
+%IMPORTANT NOTE: The sizes of the x-axis and y-axis determine how much of each
+%plane gets printed.  The planes are plotted with a function whose domain is the
+%subset of the xy-axis [\xmin,\xmax]x[\ymin,\ymax].  As a result, changing the
+%dimensions of the x-axis and y-axis will change a lot in the diagram.  However,
+%the dimensions of the z-axis will change nothing.  The height of the planes is
+%NOT determined dynamically based on the size of the z-axis.  The parameters
+%\zmax and \zmin do nothing except determine the height of the z-axis.
+\def\xmin{-1}
+\def\xmax{5}
+\def\ymin{-1}
+\def\ymax{5}
+\def\zmin{-1}
+\def\zmax{5}
+\def\axisextra{.5}
+
+%This is the color that gets used for the planes.  Note that gray works fine.
+\colorlet{planecolor1}{blue}
+\colorlet{planecolor2}{red}
+
+%Plot the axes and their labels
+\draw[<->,help lines] ({\xmin-\axisextra},0,0) -- ({\xmax+\axisextra},0,0);
+\draw[<->,help lines] (0,{\ymin-\axisextra},0) -- (0,{\ymax+\axisextra},0);
+\draw[<->,help lines] (0,0,{\zmin-\axisextra}) -- (0,0,{\zmax+\axisextra});
+\draw ({\xmax+1.5*\axisextra},0,0) node{\tiny{$x$}};
+\draw (0,{\ymax+1.5*\axisextra},0) node{\tiny{$y$}};
+\draw (0,0,{\zmax+1.5*\axisextra}) node{\tiny{$z$}};
+
+%Plot z = \cp + (\xp)*x + (\yp)*y
+\draw[planecolor1!45!black, fill=planecolor1!45, fill opacity=0.25] (\xmin,\ymin,{\cp+\xp*\xmin+\yp*\ymin}) -- (\xmax,\ymin,{\cp+\xp*\xmax+\yp*\ymin}) -- (\xmax,\ymax,{\cp+\xp*\xmax+\yp*\ymax}) -- (\xmin,\ymax,{\cp+\xp*\xmin+\yp*\ymax}) -- (\xmin,\ymin,{\cp+\xp*\xmin+\yp*\ymin});
+
+%Plot z = \cq + (\xq)*x + (\yq)*y
+\draw[planecolor2!45!black, fill=planecolor2!45, fill opacity=0.25] (\xmin,\ymin,{\cq+\xq*\xmin+\yq*\ymin}) -- (\xmax,\ymin,{\cq+\xq*\xmax+\yq*\ymin}) -- (\xmax,\ymax,{\cq+\xq*\xmax+\yq*\ymax}) -- (\xmin,\ymax,{\cq+\xq*\xmin+\yq*\ymax}) -- (\xmin,\ymin,{\cq+\xq*\xmin+\yq*\ymin});
+
+%Plot the intersection of the two planes as a dashed line.
+\draw[planecolor1!50!planecolor2,thick,dashed] ({\xmin-\axisextra},{-1*(\xmin-\axisextra)*((\xp-\xq)/(\yp-\yq)) + (\cq-\cp)/(\yp-\yq)},{-1*(\xmin-\axisextra)*(\yp*(\xp-\xq)/(\yp-\yq)-\xp) + (\cp+\yp*(\cq-\cp)/(\yp-\yq))}) -- ({\xmax+\axisextra},{-1*(\xmax+\axisextra)*((\xp-\xq)/(\yp-\yq)) + (\cq-\cp)/(\yp-\yq)},{-1*(\xmax+\axisextra)*(\yp*(\xp-\xq)/(\yp-\yq)-\xp) + (\cp+\yp*(\cq-\cp)/(\yp-\yq))});
+\end{tikzpicture}
+\caption{An example of three dimensional graphing.}
+\label{fig}
+\end{figure}
+
+\begin{figure}[ht]\centering
+\subfloat[A quadratic through three points.]{%
+\begin{tikzpicture}[scale=.75]
+\def\xmin{-1}
+\def\xmax{4}
+\def\ymin{-3}
+\def\ymax{3}
+\def\xscale{1.5}
+\def\yscale{1}
+\def\axisextra{.5}
+
+\draw[xstep=\xscale, ystep=\yscale, style = help lines, very thin] ({\xscale*\xmin-\axisextra/2},{\yscale*\ymin-\axisextra/2}) grid ({\xscale*\xmax+\axisextra/2},{\yscale*\ymax+\axisextra/2});
+\foreach \x in {\xmin,...,-1} {\draw ({\x*\xscale},0) node[below, fill=white]{\tiny{\x}};}
+\foreach \x in {1,...,\xmax} {\draw ({\x*\xscale},0) node[below, fill=white]{\tiny{\x}};}
+\foreach \y in {\ymin,...,-1} {\draw (0,{\y*\yscale}) node[left, fill=white]{\tiny{\y}};}
+\foreach \y in {1,...,\ymax} {\draw (0,{\y*\yscale}) node[left, fill=white]{\tiny{\y}};}
+\draw[<->] ({\xscale*\xmin-\axisextra},0) -- ({\xscale*\xmax+\axisextra},0) node[right]{\tiny{x}};
+\draw[<->] (0,{\yscale*\ymin-\axisextra}) -- (0,{\yscale*\ymax+\axisextra}) node[above]{\tiny{y}};
+\begin{scope}
+\clip ({\xscale*\xmin-\axisextra/2},{\yscale*\ymin-\axisextra/2}) rectangle ({\xscale*\xmax+\axisextra/2},{\yscale*\ymax+\axisextra/2});
+\draw[thick] plot[domain={\xscale*\xmin-\axisextra/2}:{\xscale*\xmax+\axisextra/2}, samples=200]({\x*\xscale},{( -1*\x*\x + 4*\x - 2 )*\yscale});
+\end{scope}
+
+\def\therad{.08}
+\draw[fill=black] ({\xscale*1},{\yscale*1}) circle(\therad) node[above left]{\small{$(1,1)$}};
+\draw[fill=black] ({\xscale*2},{\yscale*2}) circle(\therad) node[above right]{\small{$(2,2)$}};
+\draw[fill=black] ({\xscale*3},{\yscale*1}) circle(\therad) node[above right]{\small{$(3,1)$}};
+\end{tikzpicture}
+\label{fig:ThreePoints_Quadratic}}\qquad
+\subfloat[Cubics through three points.]{%
+\begin{tikzpicture}[scale=.75]
+\def\xmin{-1}
+\def\xmax{4}
+\def\ymin{-3}
+\def\ymax{3}
+\def\xscale{1.5}
+\def\yscale{1}
+\def\axisextra{.5}
+
+\draw[xstep=\xscale, ystep=\yscale, style = help lines, very thin] ({\xscale*\xmin-\axisextra/2},{\yscale*\ymin-\axisextra/2}) grid ({\xscale*\xmax+\axisextra/2},{\yscale*\ymax+\axisextra/2});
+\foreach \x in {\xmin,...,-1} {\draw ({\x*\xscale},0) node[below, fill=white]{\tiny{\x}};}
+\foreach \x in {1,...,\xmax} {\draw ({\x*\xscale},0) node[below, fill=white]{\tiny{\x}};}
+\foreach \y in {\ymin,...,-1} {\draw (0,{\y*\yscale}) node[left, fill=white]{\tiny{\y}};}
+\foreach \y in {1,...,\ymax} {\draw (0,{\y*\yscale}) node[left, fill=white]{\tiny{\y}};}
+\draw[<->] ({\xscale*\xmin-\axisextra},0) -- ({\xscale*\xmax+\axisextra},0) node[right]{\tiny{x}};
+\draw[<->] (0,{\yscale*\ymin-\axisextra}) -- (0,{\yscale*\ymax+\axisextra}) node[above]{\tiny{y}};
+\begin{scope}
+\clip ({\xscale*\xmin-\axisextra/2},{\yscale*\ymin-\axisextra/2}) rectangle ({\xscale*\xmax+\axisextra/2},{\yscale*\ymax+\axisextra/2});
+\draw[thick,red] plot[domain={\xscale*\xmin-\axisextra/2}:{\xscale*\xmax+\axisextra/2}, samples=200]({\x*\xscale},{( -1*\x*\x*\x/2 + 2*\x*\x - 3*\x/2 + 1 )*\yscale});
+\draw[thick,blue] plot[domain={\xscale*\xmin-\axisextra/2}:{\xscale*\xmax+\axisextra/2}, samples=200]({\x*\xscale},{( -\x*\x*\x/6 + 13*\x/6 - 1 )*\yscale});
+\end{scope}
+
+\def\therad{.08}
+\draw[fill=black] ({\xscale*1},{\yscale*1}) circle(\therad) node[above left]{\small{$(1,1)$}};
+\draw[fill=black] ({\xscale*2},{\yscale*2}) circle(\therad) node[above right]{\small{$(2,2)$}};
+\draw[fill=black] ({\xscale*3},{\yscale*1}) circle(\therad) node[above right]{\small{$(3,1)$}};
+\end{tikzpicture}
+\label{fig:ThreePoints_Cubic}}
+\caption{How to make graphs of functions and how to make subfigures.}
+\label{fig:ThreePoints}
+\end{figure}
+
+\end{document}
